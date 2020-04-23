@@ -9,5 +9,5 @@ response_json = response.json()
 print("totalResults = " + str(response_json["totalResults"])) # 최신 뉴스 건수 출력
 
 for i in response_json['articles']:
-    print("author = " + str(i['author']))
+    print("author = " + str(i['author'])) # 뉴스 건당 author 출력
 
