@@ -1,6 +1,6 @@
 from typing import List
 # 2차원으로 구성된 숫자의 집합으로 list of list로 구현
-from datascience.ch04.Vector import Vector
+from Vector import Vector
 
 Matrix = List[List[float]]
 
