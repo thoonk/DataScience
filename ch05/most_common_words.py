@@ -16,7 +16,7 @@ if __name__ == "__main__":
                       for word in line.strip().split()
                       if word)
 
-    for word, count in counter.most_common(num_words):
+    for word, count in counter.most_common(num_words): # Counter.most_common은 데이터의 개수가 많은 순으로 정렬된 배열을 리턴
         sys.stdout.write(str(count))
         sys.stdout.write("\t")
         sys.stdout.write(word)
