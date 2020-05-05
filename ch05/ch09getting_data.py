@@ -36,7 +36,9 @@ def process(date: str, symbol: str, closing_price: float) -> None:
 
 import csv
 
+# 구분자가 있는 파일 읽기(tab)
 with open('tab_delimited_stock_prices.txt') as f:
+    tab_reader = csv.reader(f, delimiter='\t')
     tab_reader = csv.reader(f, delimiter='\t')
     for row in tab_reader:
         date = row[0]
@@ -44,7 +46,7 @@ with open('tab_delimited_stock_prices.txt') as f:
         closing_price = float(row[2])
         process(date, symbol, closing_price)
 
-
+# 콜론 구분자 파일 출력
 with open('colon_delimited_stock_prices.txt', 'w') as f:
     f.write("""date:symbol:closing_price
 6/20/2014:AAPL:90.91
@@ -52,7 +54,7 @@ with open('colon_delimited_stock_prices.txt', 'w') as f:
 6/20/2014:FB:64.5
 """)
 
-
+# csv.DicReader를 이용해 헤더를 key로 사용하는 딕셔너리로 읽어오기
 with open('colon_delimited_stock_prices.txt') as f:
     colon_reader = csv.DictReader(f, delimiter=':')
     for dict_row in colon_reader:
@@ -160,13 +162,18 @@ deserialized = json.loads(serialized)
 assert deserialized["publicationYear"] == 2019
 assert "data science" in deserialized["topics"]
 
+# Beautiful Soup: HTML 요소를 트리 구조로 저장해서 쉽게 사용하게 하는 라이브러리
+# Requests: HTTP요청을 쉽게 할 수 있는 라이브러리
+# Html5lib: HTML parser
 def main():
     from bs4 import BeautifulSoup
     import requests
     
     url = "https://www.house.gov/representatives"
     text = requests.get(url).text
+    # URL의 Html 파일을 파싱 및 트리 생성
     soup = BeautifulSoup(text, "html5lib")
+    # 첫 <p> 태그의 값 얻기
     
     all_urls = [a['href']
                 for a in soup('a')
@@ -243,7 +250,7 @@ def main():
     
     import requests, json
     
-    github_user = "joelgrus"
+    github_user = "thoonk"
     endpoint = f"https://api.github.com/users/{github_user}/repos"
     
     repos = json.loads(requests.get(endpoint).text)
@@ -329,4 +336,4 @@ def main():
     # if instead we wanted to start consuming a sample of *all* public statuses
     # stream.statuses.sample()
     
-if __name__ == "__main__": main()
+#if __name__ == "__main__": main()
