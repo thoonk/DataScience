@@ -94,7 +94,7 @@ def data_range(xs: List[float]) -> float:
 
 assert data_range(num_friends) == 99
 
-from datascience.scratch.linear_algebra import sum_of_squares
+from scratch.linear_algebra import sum_of_squares
 
 def de_mean(xs: List[float]) -> List[float]:
     """Translate xs by subtracting its mean (so the result has mean 0)"""
@@ -130,7 +130,7 @@ daily_minutes = [1,68.77,51.25,52.08,38.36,44.54,57.13,51.4,41.42,31.22,34.76,54
 
 daily_hours = [dm / 60 for dm in daily_minutes]
 
-from datascience.scratch.linear_algebra import dot
+from scratch.linear_algebra import dot
 
 def covariance(xs: List[float], ys: List[float]) -> float:
     assert len(xs) == len(ys), "xs and ys must have same number of elements"
