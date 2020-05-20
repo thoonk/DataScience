@@ -1,6 +1,6 @@
 from collections import Counter
-from datascience.scratch.linear_algebra import distance
-from datascience.scratch.statistics import mean
+from scratch.linear_algebra import distance
+from scratch.statistics import mean
 import math, random
 import matplotlib.pyplot as plt
 
