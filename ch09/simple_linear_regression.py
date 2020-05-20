@@ -1,4 +1,4 @@
-from scratch.statistics import correlation, mean, standard_deviation
+from scratch.statistics import correlation, mean, standard_deviation, de_mean
 
 def predict(alpha, beta, x_i): #선형모델
     return beta * x_i + alpha
