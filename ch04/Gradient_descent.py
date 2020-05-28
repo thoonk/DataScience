@@ -1,7 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 from typing import List, Callable, TypeVar, Iterator
-from linear_algebra import distance, add, scalar_multiply, vector_mean
+from scratch.linear_algebra import distance, add, scalar_multiply, vector_mean
 
 Vector = List[float]
 # 경사 하강법

@@ -39,7 +39,6 @@ import csv
 # 구분자가 있는 파일 읽기(tab)
 with open('tab_delimited_stock_prices.txt') as f:
     tab_reader = csv.reader(f, delimiter='\t')
-    tab_reader = csv.reader(f, delimiter='\t')
     for row in tab_reader:
         date = row[0]
         symbol = row[1]
@@ -165,175 +164,175 @@ assert "data science" in deserialized["topics"]
 # Beautiful Soup: HTML 요소를 트리 구조로 저장해서 쉽게 사용하게 하는 라이브러리
 # Requests: HTTP요청을 쉽게 할 수 있는 라이브러리
 # Html5lib: HTML parser
-def main():
-    from bs4 import BeautifulSoup
-    import requests
+#def main():
+from bs4 import BeautifulSoup
+import requests
     
-    url = "https://www.house.gov/representatives"
-    text = requests.get(url).text
-    # URL의 Html 파일을 파싱 및 트리 생성
-    soup = BeautifulSoup(text, "html5lib")
-    # 첫 <p> 태그의 값 얻기
+url = "https://www.house.gov/representatives"
+text = requests.get(url).text
+# URL의 Html 파일을 파싱 및 트리 생성
+soup = BeautifulSoup(text, "html5lib")
+# 첫 <p> 태그의 값 얻기
     
-    all_urls = [a['href']
-                for a in soup('a')
-                if a.has_attr('href')]
+all_urls = [a['href']
+            for a in soup('a')
+            if a.has_attr('href')]
     
-    print(len(all_urls))  # 965 for me, way too many
+print(len(all_urls))  # 965 for me, way too many
     
-    import re
+import re
     
-    # Must start with http:// or https://
-    # Must end with .house.gov or .house.gov/
-    regex = r"^https?://.*\.house\.gov/?$"
+# Must start with http:// or https://
+# Must end with .house.gov or .house.gov/
+regex = r"^https?://.*\.house\.gov/?$"
     
-    # Let's write some tests!
-    assert re.match(regex, "http://joel.house.gov")
-    assert re.match(regex, "https://joel.house.gov")
-    assert re.match(regex, "http://joel.house.gov/")
-    assert re.match(regex, "https://joel.house.gov/")
-    assert not re.match(regex, "joel.house.gov")
-    assert not re.match(regex, "http://joel.house.com")
-    assert not re.match(regex, "https://joel.house.gov/biography")
+# Let's write some tests!
+assert re.match(regex, "http://joel.house.gov")
+assert re.match(regex, "https://joel.house.gov")
+assert re.match(regex, "http://joel.house.gov/")
+assert re.match(regex, "https://joel.house.gov/")
+assert not re.match(regex, "joel.house.gov")
+assert not re.match(regex, "http://joel.house.com")
+assert not re.match(regex, "https://joel.house.gov/biography")
     
-    # And now apply
-    good_urls = [url for url in all_urls if re.match(regex, url)]
+# And now apply
+good_urls = [url for url in all_urls if re.match(regex, url)]
     
-    print(len(good_urls))  # still 862 for me
-    
-    
-    num_original_good_urls = len(good_urls)
-    
-    good_urls = list(set(good_urls))
-    
-    print(len(good_urls))  # only 431 for me
+print(len(good_urls))  # still 862 for me
     
     
-    assert len(good_urls) < num_original_good_urls
+num_original_good_urls = len(good_urls)
     
-    html = requests.get('https://jayapal.house.gov').text
+good_urls = list(set(good_urls))
+    
+print(len(good_urls))  # only 431 for me
+    
+    
+assert len(good_urls) < num_original_good_urls
+    
+html = requests.get('https://jayapal.house.gov').text
+soup = BeautifulSoup(html, 'html5lib')
+    
+# Use a set because the links might appear multiple times.
+links = {a['href'] for a in soup('a') if 'press releases' in a.text.lower()}
+    
+print(links) # {'/media/press-releases'}
+    
+    
+    
+# I don't want this file to scrape all 400+ websites every time it runs.
+# So I'm going to randomly throw out most of the urls.
+# The code in the book doesn't do this.
+import random
+good_urls = random.sample(good_urls, 5)
+print(f"after sampling, left with {good_urls}")
+    
+from typing import Dict, Set
+    
+press_releases: Dict[str, Set[str]] = {}
+    
+for house_url in good_urls:
+    html = requests.get(house_url).text
     soup = BeautifulSoup(html, 'html5lib')
+    pr_links = {a['href'] for a in soup('a') if 'press releases' in a.text.lower()}
+    print(f"{house_url}: {pr_links}")
+    press_releases[house_url] = pr_links
     
-    # Use a set because the links might appear multiple times.
-    links = {a['href'] for a in soup('a') if 'press releases' in a.text.lower()}
+for house_url, pr_links in press_releases.items():
+    for pr_link in pr_links:
+        url = f"{house_url}/{pr_link}"
+        text = requests.get(url).text
     
-    print(links) # {'/media/press-releases'}
+        if paragraph_mentions(text, 'data'):
+            print(f"{house_url}")
+            break  # done with this house_url
     
+import requests, json
     
+github_user = "thoonk"
+endpoint = f"https://api.github.com/users/{github_user}/repos"
     
-    # I don't want this file to scrape all 400+ websites every time it runs.
-    # So I'm going to randomly throw out most of the urls.
-    # The code in the book doesn't do this.
-    import random
-    good_urls = random.sample(good_urls, 5)
-    print(f"after sampling, left with {good_urls}")
+repos = json.loads(requests.get(endpoint).text)
     
-    from typing import Dict, Set
+from collections import Counter
+from dateutil.parser import parse
     
-    press_releases: Dict[str, Set[str]] = {}
-    
-    for house_url in good_urls:
-        html = requests.get(house_url).text
-        soup = BeautifulSoup(html, 'html5lib')
-        pr_links = {a['href'] for a in soup('a') if 'press releases' in a.text.lower()}
-        print(f"{house_url}: {pr_links}")
-        press_releases[house_url] = pr_links
-    
-    for house_url, pr_links in press_releases.items():
-        for pr_link in pr_links:
-            url = f"{house_url}/{pr_link}"
-            text = requests.get(url).text
-    
-            if paragraph_mentions(text, 'data'):
-                print(f"{house_url}")
-                break  # done with this house_url
-    
-    import requests, json
-    
-    github_user = "thoonk"
-    endpoint = f"https://api.github.com/users/{github_user}/repos"
-    
-    repos = json.loads(requests.get(endpoint).text)
-    
-    from collections import Counter
-    from dateutil.parser import parse
-    
-    dates = [parse(repo["created_at"]) for repo in repos]
-    month_counts = Counter(date.month for date in dates)
-    weekday_counts = Counter(date.weekday() for date in dates)
-    print(month_counts)
-    print(weekday_counts)
+dates = [parse(repo["created_at"]) for repo in repos]
+month_counts = Counter(date.month for date in dates)
+weekday_counts = Counter(date.weekday() for date in dates)
+print("month: " + str(month_counts))
+print("weekday: " + str(weekday_counts))
 
-    last_5_repositories = sorted(repos,
-                                 key=lambda r: r["pushed_at"],
-                                 reverse=True)[:5]
+last_5_repositories = sorted(repos,
+                                key=lambda r: r["pushed_at"],
+                                reverse=True)[:5]
     
-    last_5_languages = [repo["language"]
-                        for repo in last_5_repositories]
+last_5_languages = [repo["language"]
+                    for repo in last_5_repositories]
     
-    import os
-    
-    # Feel free to plug your key and secret in directly
-    CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
-    CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")
-    
-    import webbrowser
-    from twython import Twython
-    
-    # Get a temporary client to retrieve an authentication url
-    temp_client = Twython(CONSUMER_KEY, CONSUMER_SECRET)
-    temp_creds = temp_client.get_authentication_tokens()
-    url = temp_creds['auth_url']
-    
-    # Now visit that URL to authorize the application and get a PIN
-    print(f"go visit {url} and get the PIN code and paste it below")
-    webbrowser.open(url)
-    PIN_CODE = input("please enter the PIN code: ")
-    
-    # Now we use that PIN_CODE to get the actual tokens
-    auth_client = Twython(CONSUMER_KEY,
-                          CONSUMER_SECRET,
-                          temp_creds['oauth_token'],
-                          temp_creds['oauth_token_secret'])
-    final_step = auth_client.get_authorized_tokens(PIN_CODE)
-    ACCESS_TOKEN = final_step['oauth_token']
-    ACCESS_TOKEN_SECRET = final_step['oauth_token_secret']
-    
-    # And get a new Twython instance using them.
-    twitter = Twython(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-    
-    from twython import TwythonStreamer
-    
-    # Appending data to a global variable is pretty poor form
-    # but it makes the example much simpler
-    tweets = []
-    
-    class MyStreamer(TwythonStreamer):
-        def on_success(self, data):
-            """
-            What do we do when twitter sends us data?
-            Here data will be a Python dict representing a tweet
-            """
-            # We only want to collect English-language tweets
-            if data.get('lang') == 'en':
-                tweets.append(data)
-                print(f"received tweet #{len(tweets)}")
-    
-            # Stop when we've collected enough
-            if len(tweets) >= 100:
-                self.disconnect()
-    
-        def on_error(self, status_code, data):
-            print(status_code, data)
-            self.disconnect()
-    
-    stream = MyStreamer(CONSUMER_KEY, CONSUMER_SECRET,
-                        ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-    
-    # starts consuming public statuses that contain the keyword 'data'
-    stream.statuses.filter(track='data')
-    
-    # if instead we wanted to start consuming a sample of *all* public statuses
-    # stream.statuses.sample()
-    
-#if __name__ == "__main__": main()
+# import os
+#
+# # Feel free to plug your key and secret in directly
+# CONSUMER_KEY = os.environ.get("TWITTER_CONSUMER_KEY")
+# CONSUMER_SECRET = os.environ.get("TWITTER_CONSUMER_SECRET")
+#
+# import webbrowser
+# from twython import Twython
+#
+# # Get a temporary client to retrieve an authentication url
+# temp_client = Twython(CONSUMER_KEY, CONSUMER_SECRET)
+# temp_creds = temp_client.get_authentication_tokens()
+# url = temp_creds['auth_url']
+#
+# # Now visit that URL to authorize the application and get a PIN
+# print(f"go visit {url} and get the PIN code and paste it below")
+# webbrowser.open(url)
+# PIN_CODE = input("please enter the PIN code: ")
+#
+# # Now we use that PIN_CODE to get the actual tokens
+# auth_client = Twython(CONSUMER_KEY,
+#                         CONSUMER_SECRET,
+#                         temp_creds['oauth_token'],
+#                         temp_creds['oauth_token_secret'])
+# final_step = auth_client.get_authorized_tokens(PIN_CODE)
+# ACCESS_TOKEN = final_step['oauth_token']
+# ACCESS_TOKEN_SECRET = final_step['oauth_token_secret']
+#
+# # And get a new Twython instance using them.
+# twitter = Twython(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+#
+# from twython import TwythonStreamer
+#
+# # Appending data to a global variable is pretty poor form
+# # but it makes the example much simpler
+# tweets = []
+#
+# class MyStreamer(TwythonStreamer):
+#     def on_success(self, data):
+#         """
+#         What do we do when twitter sends us data?
+#         Here data will be a Python dict representing a tweet
+#         """
+#         # We only want to collect English-language tweets
+#         if data.get('lang') == 'en':
+#             tweets.append(data)
+#             print(f"received tweet #{len(tweets)}")
+#
+#         # Stop when we've collected enough
+#         if len(tweets) >= 100:
+#             self.disconnect()
+#
+#     def on_error(self, status_code, data):
+#         print(status_code, data)
+#         self.disconnect()
+#
+# stream = MyStreamer(CONSUMER_KEY, CONSUMER_SECRET,
+#                     ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+#
+# # starts consuming public statuses that contain the keyword 'data'
+# stream.statuses.filter(track='data')
+#
+# # if instead we wanted to start consuming a sample of *all* public statuses
+# # stream.statuses.sample()
+#
+# #if __name__ == "__main__": main()
